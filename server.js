@@ -28,7 +28,7 @@ var kurento = require('kurento-client');
 
 // Constants
 var settings = {
-        WEBSOCKETURL: process.env.PORT || "http://localhost:3005/",
+        WEBSOCKETURL: "http://localhost:"+process.env.PORT || "http://localhost:3005/",
         KURENTOURL: "ws://localhost:8888/kurento"
 };
 
