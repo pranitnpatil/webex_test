@@ -258,7 +258,7 @@ async function shareScreen(message) {
   console.log(message);
 
     shareBtn.onclick = function () {
-      ssflag=true;
+      
     var canvas = document.getElementById("preview");
     var context = canvas.getContext("2d");
 
@@ -268,8 +268,8 @@ async function shareScreen(message) {
     context.width = canvas.width;
     context.height = canvas.height;
 
-    var screen = document.getElementById("local_video");
-
+    var screen = document.getElementById("local_video2");
+      
     // var socket = io();
 
     function logger(msg) {
@@ -306,8 +306,19 @@ async function shareScreen(message) {
           .getDisplayMedia({ cursor: true })
           .then((stream) => {
             screen.srcObject = stream;
+            ssflag=true;
+            screen.style="width: 250px; height:200px; display: block;";
+            document.getElementById("local_video").style=" display: none;";
+            document.getElementById("screenshare").style="display: block;";
+            stream.oninactive = ()=>{
+              ssflag=false;
+              alert("screen sharing has stopped!");
+              screen.style="width: 250px; height:200px; display: none;";
+              document.getElementById("screenshare").style="display: none;";
+              document.getElementById("local_video").style="width: 250px; height:200px;";
+            }
           });
-      }
+      } 
 
       setInterval(function () {
         viewVideo(screen, context);
@@ -315,6 +326,8 @@ async function shareScreen(message) {
     });
   };
 }
+
+
 
 /**
  * Add new participant locally and request video from new participant
@@ -401,8 +414,9 @@ function onParticipantLeft(message) {
     // remove video tag
     //document.getElementById("video-" + participant.id).remove();
     var div = document.getElementById("div-"+ participant.id);
+    var name= document.getElementById("name-"+ participant.id);
     // Internet Explorer doesn't know element.remove(), does know this
-    
+    name.parentNode.removeChild(name);
     div.parentNode.removeChild(div);
 }
 
@@ -431,6 +445,8 @@ function onReceiveVideoAnswer(message) {
  * @param participant
  * @returns {Element}
  */
+
+var pinflag =false;
 function createVideoForParticipant(participant) {
 
     var videoId = "video-" + participant.id;
@@ -439,7 +455,8 @@ function createVideoForParticipant(participant) {
     video = document.createElement('video');
     vname = document.createElement('a');
     pin = document.createElement('button');
-
+    vname.id="name-" + participant.id;
+    vname.name=participant.name;
     div.id= "div-"+ participant.id;
     video.name = participant.name;
     video.autoplay = true;
@@ -447,13 +464,29 @@ function createVideoForParticipant(participant) {
     div.className="class5";
     video.poster = "img/user.jpg";
     vname.innerHTML=participant.name;
-    var div_id = div.id;
-    pin.onclick = function enlarge(div_id){
-      alert("moshi"+ div_id);};
+    pin.className="pinbutton";
+    pin.id="pin-"+ participant.id;
+    pin.onclick = function enlarge(){
+      var enlarge = pin.id.replace("pin", "div")
+      if (pinflag == false){
+          pinflag = true;
+          
+          document.getElementById(enlarge).className="class1";
+          document.getElementById(enlarge).style="width:95%; height: 95%; float: left; display: block;";
+          
+        }
+        else{
+          document.getElementById(enlarge).className="class5";
+          document.getElementById(enlarge).style="width:25%; height: 150px; float: left; display: block;";
+          pinflag = false;
+        }
+
+
+      };
     div.appendChild(video);
     div.appendChild(vname);
     div.appendChild(pin);
-
+    document.getElementById("people_list").appendChild(vname);  
     document.getElementById("video_list").appendChild(div);
     
     // return video element
@@ -462,16 +495,20 @@ function createVideoForParticipant(participant) {
 
 setInterval(function(){
     var elements = document.getElementsByClassName('class5');
-    videoCount=elements.length-1;
+    videoCount=elements.length;
+    document.getElementById("people_count").innerHTML="People("+(videoCount)+")";
     if (ssflag==true){
       videoCount+=1;
     }
+    
+
+    if(pinflag==false){
     for (var i in elements) {
         if(videoCount==1){
             elements[i].style="width:95%; height: 95%; float: left; display: block;max-width: 100%;";
         }
         else if(videoCount==2){
-            elements[i].style="width:49%; height: 65%; float: left;top:10%; display: block;max-width: 100%;";
+            elements[i].style="width:49%; height: 65%; float: left; top:10% ; display: block;max-width: 100%;";
         }
         else if(videoCount>2 && videoCount<5){
             elements[i].style="width:49%; height: 49%; float: left; display: block";
@@ -480,24 +517,33 @@ setInterval(function(){
             elements[i].style="width:25%; height: 150px; float: left; display: block";
         }
         }
+      }
+    else{
+      for (var i in elements) {
+        elements[i].style="display:none";
+      }
+    }
 }, 5000);
 
 
-var pinflag =false
-// function enlarge(id){
-//         alert("moshi"+id);
 
-//     // var enlarge = document.getElementById(id);
-//     //  enlarge.onclick = function(){
-//     //      if (Flag == false){
-//     //         enlarge.style="width:95%; height: 95%; float: left;";
-//     //         Flag = true;
-//     //      }
-//     //      else{
-//     //         enlarge.style="width:25%; height: 150px; float: left;";
-//     //         Flag = false;
-//     //      }
-//     //  }
+// function enlarge_share(){
+//   var ss_id=document.getElementById("screen_img");
+//   if (pinflag == false){
+//       pinflag = true;
+      
+//       ss_id.className="class1";
+//       ss_id.style="width:95%; height: 95%; float: left;";
+      
+//     }
+//     else{
+//       ss_id.className="class5";
+//       ss_id.style="width:25%; height: 150px; float: left;";
+//       pinflag = false;
+//     }
+
+
+//   };
 
 // }
 // function sendMess(user) {
@@ -619,6 +665,7 @@ $(function () {
     socket.emit("login", { username: data.username,roomName: data.room });
     console.log(data.username);
     username = data.username;
+    document.getElementById("username").innerHTML=data.username;
     // Display the welcome message
     var message = "Welcome, " + data.username;
     log(message, {
@@ -661,6 +708,7 @@ $(function () {
   socket.on("user joined", function (data) {
     log(data.username + " joined");
     addParticipantsMessage(data.numUsers);
+
     beep();
   });
 
