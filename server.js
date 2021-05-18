@@ -28,8 +28,8 @@ var kurento = require('kurento-client');
 
 // Constants
 var settings = {
-        WEBSOCKETURL: "http://localhost:3005/",
-        KURENTOURL: "ws://localhost:8888/kurento"
+    WEBSOCKETURL: "http://localhost:"+process.env.PORT || "http://localhost:3005/",
+    KURENTOURL: "ws://localhost:8888/kurento"
 };
 
 // Singleton Kurento Client, gets set on first interaction

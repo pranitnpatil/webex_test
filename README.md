@@ -18,5 +18,10 @@ Start the server in the root folder with `node server`
 
 Visit localhost:8080 in a browser.
 
+<<<<<<< HEAD
 Currently works with Internet Explorer, Safari, Google Chrome and Firefox. Not tested in other browsers."# webx" 
 "# webx" 
+=======
+Currently works with Internet Explorer, Safari, Google Chrome and Firefox. Not tested in other browsers."# webx" 
+"# webx" 
+>>>>>>> 9a77807... dk
